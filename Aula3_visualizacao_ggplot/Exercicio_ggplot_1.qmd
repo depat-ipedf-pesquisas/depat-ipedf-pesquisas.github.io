@@ -1,0 +1,74 @@
+---
+title: "Exercicio 1 ggplot"
+format: html
+---
+
+```{r}
+# Carregando pacotes
+
+pacman::p_load(ggthemes, tidyverse, rio, sf, rnaturalearth, geobr,ggspatial, ggthemes, gsubfn, esquisse,
+                ggridges)
+```
+
+
+#  VÁRIAS FORMAS DE FAZER A MESMA COISA
+
+- Olhe atentamente para os códigos abaixo. Eles fazem a mesma coisa, mas escritos de formas diferentes. 
+
+- Tente uma quinta opção diferente das anteriores!!!!
+
+## Gráfico de pontos opção 1
+
+```{r , echo=F}
+iris |> 
+ggplot(aes(x = Petal.Length, y = Sepal.Length)) +
+  geom_point()
+
+```
+
+## Gráfico de pontos opção 2
+
+```{r , echo=F}
+ggplot(iris, aes(x = Petal.Length, y = Sepal.Length)) +
+  geom_point()
+                          
+```
+
+## Gráfico de pontos opção 3
+
+```{r , echo=F}
+  ggplot(iris) +
+  geom_point(aes(x = Petal.Length,
+                 y = Sepal.Length))                         
+
+```
+
+## Gráfico de pontos opção 4
+
+```{r , echo=F}
+
+ggplot(data = iris, 
+       mapping = aes(x = Sepal.Length,
+                     y = Petal.Length))+ 
+  geom_point()      
+
+ggplot(mapping = aes(x = Sepal.Length,
+                     y = Petal.Length), 
+       data = iris) +
+  geom_point()         
+```
+
+## Gráfico de pontos opção 5
+
+```{r , echo=F}
+ggplot(iris, 
+       mapping = aes(Petal.Length,
+                     Sepal.Length)) +
+  geom_point()                             
+
+```
+
+
+
+
+

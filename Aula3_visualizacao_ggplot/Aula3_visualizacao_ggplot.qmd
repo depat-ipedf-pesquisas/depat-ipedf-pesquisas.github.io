@@ -1,0 +1,546 @@
+---
+title: "Oficina 3"
+subtitle: "CE II: Visualização de dados - ggplot2"
+author: 
+  - Carolina Musso
+  - Luiz Oliveira 
+  - Rafael de Acypreste
+institute: "DEPAT/IPE-DF"
+format:
+  revealjs:
+    incremental: true 
+    multiplex: true
+    scrollable: true
+    theme: ../style.scss
+    logo: ../img/logo.png
+    code-blo=k-border-left: "#31BAE9"
+    code-block-bg: "#011627"
+    code-overflow: wrap
+    transition: fade
+    self-contained: true
+knitr:
+  opts_chunk:
+    echo: true
+    warnings: false
+editor: source
+markdown: 
+    wrap: 72
+---
+
+## O pacote ggplot2
+
+Um pacote (extensão do R) para visualização de dados muito famoso no meio de Ciência de Dados.
+
+![](../img/ggplot.png){fig-align="center"}
+
+-   Ele faz parte do tidyverse.
+
+## O que vamos (começar) aprender nessa aula
+
+-   Uma forma reprodutível de visualizar dados e com muitas possibilidades de customização.
+
+    -   [Data-to-Viz](https://www.data-to-viz.com)
+    -   [R Gallery](https://r-graph-gallery.com)
+    -   [Bruno Mioto](https://brunomioto.com/charts.html)
+
+## A lógica do ggplot2
+
+-   Utiliza a [Gramática dos gráficos](https://link.springer.com/book/10.1007/0-387-28695-0) (daí o gg de ggplot): você precisa de atributos estéticos (cor, tamanho...) e atributos geométricos (pontos, linhas, colunas...).
+
+-   [São utilizadas camadas](https://vita.had.co.nz/papers/layered-grammar.html): Sobreposição de elementos visuais.
+
+## A lógica do ggplot
+
+```{r echo=F}
+# PREPARAÇÕES  INICIAIS ----
+
+rm(list=ls())  #limpa  o ambient
+if (!require(pacman)) install.packages("pacman") #garante que tem o pacman
+pacman::p_load(tidyverse, 
+               palmerpenguins,
+               nycflights13,
+               ggridges) #carrega os pacotes
+```
+
+::: panel-tabset
+### Primeira camada
+
+-   O "canvas" vazio
+
+```{r}
+penguins |> 
+  ggplot()
+```
+
+### Segunda camada
+
+-   Os dados (eixos)
+
+```{r}
+penguins |> 
+  ggplot()+
+  aes(x = body_mass_g, 
+      y = flipper_length_mm)
+```
+
+### Terceira camada
+
+-   A geometria
+
+```{r}
+penguins |> 
+  ggplot()+
+  aes(x = body_mass_g, 
+      y = flipper_length_mm) |> 
+  geom_point()
+```
+
+### ...
+
+-   As firulas
+
+```{r}
+penguins %>%
+  ggplot(aes(x = body_mass_g, y = flipper_length_mm, color = species)) +
+  geom_point(size = 3) +
+  scale_color_brewer("Espécie", palette = "Set2") +  # Defina cores chamativas
+  labs(title = "Relação entre Massa Corporal e Comprimento da Nadadeira",   # Título
+       subtitle = "Base de Dados Palmer Penguins",                           # Subtítulo
+       x = "Massa Corporal (g)",                                             # Rótulo do eixo X
+       y = "Comprimento da Nadadeira (mm)") +                                 # Rótulo do eixo Y
+  annotate("text", x = 4800, y = 215,
+           label = "Gentoo tem o maior tamanho corporal",               # Adiciona anotação
+           color = "black",
+           size = 5, 
+           fontface = "bold",
+           angle = 30
+           ) +
+  theme_classic()  # Estilo do tema
+```
+:::
+
+## Lógica do ggplot
+
+As camadas são adicionadas com um "+"
+
+-   Diferença **+** para **%\>%** ou **\|\>**
+-   Há as partes *estáticas* e partes que *dinâmicas* (que respondem aos dados)
+-   Cuidado com as aspas (principalmente nas opções de parâmetros)!
+-   Conheça as variáveis (numéricas ou categóricas)
+-   É preciso ter no mínimo a função ggplot() e uma função de geometria geom\_?()
+-   Há várias formas de escrever a mesma coisa!
+
+## Várias formas de fazer a mesma coisa
+
+::: panel-tabset
+## Opção 1
+
+```{r}
+ggplot(data = cars) + 
+  geom_point(mapping = aes(x = speed, 
+                        y = dist))
+```
+
+## Opção 2
+
+```{r}
+ggplot(cars) + 
+  geom_point(aes(x = speed, y = dist))
+```
+
+## Opção 3
+
+```{r}
+ggplot(cars, aes(x = speed, y = dist)) + 
+  geom_point( )
+```
+
+## Opção 4
+
+```{r}
+ggplot(cars) + 
+  aes(x = speed, y = dist) +
+  geom_point()
+```
+
+## Opção 5
+
+```{r}
+cars  |>  # atenção que aqui ainda é o pipe!
+ggplot() + 
+  aes(x = speed, y = dist) +
+  geom_point()
+```
+:::
+
+# Vamos ao R-Studio!
+
+## Desafio
+
+-   Diferença do **fill=** dentro ou fora do **aes()** ?
+
+. . .
+
+```{r eval=F}
+ggplot(penguins) + 
+  geom_point(aes(x = body_mass_g , y = flipper_length_mm), color = species)
+```
+
+![](../img/errogg.png)
+
+-   O que aconteceu aqui?
+
+## Mapeamento dos dados
+
+::: panel-tabset
+## Opção 1
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, color=class)) + 
+  geom_point( )
+```
+
+## Opção 2
+
+```{r}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point(aes(color=class))
+```
+
+## Opção 3
+
+```{r}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point(color="blue")
+```
+:::
+
+## *Faceting*
+
+```{r}
+ggplot(penguins)+
+  geom_point(aes(x = body_mass_g, 
+                y = flipper_length_mm, 
+                color = species)) +
+  facet_grid(year ~ island)
+```
+
+# Vamos ao R-Studio!
+
+## Pacote Esquisse
+
+[![](../img/esquisse.png){fig-align="center"}](https://dreamrs.github.io/esquisse/)
+
+# Customizações
+
+## Temas
+
+::: panel-tabset
+## Padrão
+
+```{r}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point()
+```
+
+## Minimal
+
+```{r}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point() +
+  theme_minimal()
+```
+
+## Black & White
+
+```{r}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point()+
+  theme_bw(base_size=20)
+```
+
+## Classic
+
+```{r}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point() +
+  theme_classic()
+```
+
+## Void
+
+```{r}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point() +
+  theme_void()
+```
+:::
+
+## ggthemes
+
+-   ggplot [extensions](https://exts.ggplot2.tidyverse.org/ggthemes.html)
+
+. . .
+
+::: panel-tabset
+## economist
+
+```{r}
+pacman::p_load(ggthemes)
+
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point() +
+  theme_economist()
+```
+
+## solarized
+
+```{r}
+pacman::p_load(ggthemes)
+
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point() +
+  theme_solarized()
+```
+
+## Excel
+
+```{r}
+pacman::p_load(ggthemes)
+
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point()+
+  theme_excel()
+```
+:::
+
+## Fazer o próprio tema
+
+```{r eval=F}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point(color="white") +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    axis.title = element_text(color = "purple"),
+    panel.background = element_rect(fill = "black"),
+    panel.grid = element_blank()
+  )
+```
+
+. . .
+
+```{r echo=F}
+ggplot(mpg) + 
+  aes(x = displ, y = hwy) +
+  geom_point(color= "white") +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    axis.title = element_text(color = "purple"),
+    panel.background = element_rect(fill = "black"),
+    panel.grid = element_blank()
+  )
+```
+
+-   faça `?theme` e veja quantos parâmetros essa função tem!
+
+## Cores
+
+```{r eval=F}
+colorspace::hcl_color_picker()
+```
+
+### Escala Manual
+
+::: panel-tabset
+## Nomes: color
+
+```{r}
+ggplot(penguins, aes(y = flipper_length_mm, 
+                     x = body_mass_g, 
+                     color = species))+
+  geom_point() +
+  scale_color_manual(values=c("aquamarine", 
+                              "deeppink1",
+                              "indianred1"))
+```
+
+## Nomes: fill
+
+```{r}
+ggplot(penguins, aes(y = flipper_length_mm, 
+                     x = body_mass_g, 
+                     fill = species))+
+  geom_boxplot() +
+  scale_fill_manual(name = "Espécie", 
+                    values=c("aquamarine",
+                             "deeppink1",
+                             "indianred1"))
+```
+
+-   [Nomes cores](http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf)
+
+## Hexadecimal
+
+```{r}
+ggplot(penguins, aes(y = flipper_length_mm, 
+                     x = body_mass_g, 
+                     color = species))+
+  geom_point()+
+  scale_color_manual(values=c("#81968F", 
+                              "#E9D6EC",
+                              "#F4D6C8")) +
+  theme_classic()
+```
+:::
+
+## RColorBrewer
+
+::: panel-tabset
+## seq
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, 
+                 y = hwy, 
+                 color = class)) +
+  scale_color_brewer(type="seq")
+```
+
+## div
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, 
+                 y = hwy, 
+                 color = class)) +
+  scale_color_brewer(type="div")
+```
+
+## qual
+
+```{r}
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, 
+                 y = hwy, 
+                 color = class)) +
+  scale_color_brewer(type="qual")
+```
+:::
+
+# Vamos ao R-Studio!
+
+## Outros gráficos
+
+-   [ggplot2 extensions](https://exts.ggplot2.tidyverse.org/gallery/)
+
+```{r}
+
+ggplot(penguins, aes(x = flipper_length_mm,
+                     fill = species)) +
+  geom_density_ridges(aes(y = species)) +
+  scale_fill_brewer("Espécie", palette = "Set3")
+```
+
+. . .
+
+```{r}
+pacman::p_load_gh("AllanCameron/geomtextpath")
+ggplot(penguins, aes(x = body_mass_g, 
+                     y = flipper_length_mm))+
+  geom_point() +
+   geom_labelsmooth(aes(label = "Linha de tendencia"), 
+                    text_smoothing = 30, 
+                    fill = "lightblue",
+                    color= "indianred") +
+  theme_classic()
+```
+
+## Mapas com R
+
+```{r echo=F}
+pacman::p_load(tidyverse, rio, sf, rnaturalearth, geobr,
+               ggspatial, ggthemes, gsubfn, esquisse,
+                ggridges, emojifont, fontawesome)
+who_bruto <- import("https://covid19.who.int/WHO-COVID-19-global-data.csv")
+
+
+# SHAPEFILES ----
+
+#MUNDO
+mundo <- ne_countries(scale = "medium", returnclass = "sf")
+
+who_trat <- who_bruto %>% 
+  dplyr::select(WHO_region,Date_reported,Country,New_cases,Cumulative_cases, New_deaths)%>% 
+  dplyr::group_by(WHO_region, Country) %>% # agrupando  (tabela dinamica)
+  dplyr::summarise(Acumulado=max(Cumulative_cases, na.rm=T)) 
+
+# Shape
+
+## Renomeando a coluna para o join. 
+## Renomeei usando o Rbase porque o dplyr não aceitou mais
+names(mundo)[10] <- "Country"
+mundo_trat <- mundo 
+covid_mundo_com_shape <- left_join(who_trat,  mundo_trat)
+
+names(mundo_trat)[45] <- "iso"
+mundo_iso <- mundo_trat 
+
+who_acumulado_iso <- who_bruto %>% 
+  dplyr::group_by(Country_code) %>% #iso
+  dplyr::summarise(Acumulado=max(Cumulative_cases, na.rm=T)) %>% 
+  rename(iso=Country_code)
+
+covid_mundo_com_shape_iso <- left_join(who_acumulado_iso, mundo_iso)
+```
+
+```{r}
+ggplot(mundo)+
+  geom_sf(aes(geometry=geometry))
+```
+
+. . .
+
+```{r}
+covid_mundo_com_shape_iso2 <- covid_mundo_com_shape_iso %>% 
+  mutate(Acumulado_cat=cut(Acumulado,
+                           breaks=c(-1,25000,320000,5000000, max(covid_mundo_com_shape_iso$Acumulado, na.rm=T)+1), labels=c("até 25 mil", "25 mil - 320 mil ", "320 mil - 5 milhão", "acima de 5 milhões")))
+paleta<-c('#feebe2','#fbb4b9','#f768a1','#ae017e')
+ggplot(covid_mundo_com_shape_iso2, fill="white")+
+  geom_sf(aes(geometry=geometry, fill=Acumulado_cat ), color="purple", # cor da fronteira
+              lwd=0.1) + # finura da fronteira
+  scale_fill_manual(values=paleta, name="Casos Acumulados \n de covid-19  no Mundo")+
+  theme_map(base_size=24)+
+ theme(panel.background = element_rect(fill = "lightblue"),
+       legend.position = "bottom")+
+  ggtitle("Um mapa bonito")#oceano
+```
+
+## Mais Dicas
+
+-   [Cheat Sheets](https://www.maths.usyd.edu.au/u/UG/SM/STAT3022/r/current/Misc/data-visualization-2.1.pdf)- [EpiHandbook, Cap.30](https://epirhandbook.com/en/ggplot-basics.html)
+
+-   Curso-R, [Livro, cap. 13.8](https://livro.curso-r.com/13-8-o-pacote-ggplot2-1.html); [Curso Visualização](https://curso-r.github.io/202207-visualizacao)
+
+-   [DataCamp, Introdução a visualização com ggplot](https://app.datacamp.com/learn/courses/introduction-to-data-visualization-with-ggplot2)
+
+-   [R4DS](https://r4ds.had.co.nz) *O livro começa com gráficos!*
+
+-   [GGPLOT](https://ggplot2-book.org/mastery.html)
+
+-   [Temas](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+
+# Obrigada!

@@ -1,0 +1,16 @@
+---
+title: "Exercicio ggplot 4"
+format: html
+---
+
+
+
+```{r}
+pacman::p_load(tidyverse, esquisse, palmerpenguins)
+
+```
+
+```{r}
+esquisser(penguins)
+```
+

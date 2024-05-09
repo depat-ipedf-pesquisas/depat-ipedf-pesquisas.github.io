@@ -1,0 +1,26 @@
+---
+title: "Exercicio 2 ggplot"
+format: html
+---
+
+
+## Faça pelo menos três edições no gráfico abaixo
+
+Para saber mais sobre a base ou as funções utilizadas, acesse a documentação digitando ?nome_da_funcao no console seguido de Enter.
+
+
+```{r}
+penguins |> 
+  ggplot(aes(x = body_mass_g,
+             y = flipper_length_mm, 
+             color = species)) +
+  geom_point(size = 3) +
+  scale_color_brewer("Espécie",
+                     palette = "Set2") + 
+  labs(title = "Relação entre Massa Corporal e Comprimento da Nadadeira",   # Título
+       subtitle = "Base de Dados Palmer Penguins",                           # Subtítulo
+       x = "Massa Corporal (g)",                                             # Rótulo do eixo X
+       y = "Comprimento da Nadadeira (mm)") +                                 # Rótulo do eixo Y
+  theme_classic()  # Estilo do tema
+```
+

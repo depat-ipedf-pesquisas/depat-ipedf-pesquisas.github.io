@@ -1,0 +1,38 @@
+---
+title: "Exercicio 2 ggplot"
+format: html
+---
+
+```{r}
+pacman::p_load(tidyverse, esquisse, palmerpenguins)
+
+```
+
+
+## Corrija para que a cor corresponda à classe do veículo
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point( color=class )
+```
+
+## Corrija para que os pontos sejam azuis
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point( color = blue )
+```
+
+
+## Faça o mesmo gráfico com outra cor
+
+```{r}
+
+```
+
+## Acrescente uma camada labs() e Defina novos nomes para os eixos x e y. 
+
+```{r}
+
+```
+
